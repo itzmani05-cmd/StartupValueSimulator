@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Equity Scenario Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="py-6">
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        Startup Equity Scenario Builder
+                    </h1>
+                    <p class="text-gray-500 mt-2">Model ownership changes across funding rounds</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                <h2 class="text-xl font-semibold text-blue-800 mb-2">Welcome to the Equity Scenario Builder</h2>
+                <p class="text-blue-700">
+                    This is a demo version that shows the concept. The full Rust + Leptos version will provide:
+                    real-time equity modeling, funding round simulation, cap table management, and exit scenario analysis.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Founder Setup</h2>
+                        <p class="text-gray-600">Configure founders and initial equity splits</p>
+                        <div class="mt-4 p-4 bg-gray-50 rounded">
+                            <p class="text-sm">• Add/remove founders</p>
+                            <p class="text-sm">• Set ownership percentages</p>
+                            <p class="text-sm">• Real-time validation</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Funding Rounds</h2>
+                        <p class="text-gray-600">Model different types of funding rounds</p>
+                        <div class="mt-4 p-4 bg-gray-50 rounded">
+                            <p class="text-sm">• Equity, SAFEs, Convertible Notes</p>
+                            <p class="text-sm">• ESOP allocations</p>
+                            <p class="text-sm">• Anti-dilution protection</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Cap Table</h2>
+                        <p class="text-gray-600">Live ownership structure updates</p>
+                        <div class="mt-4 p-4 bg-gray-50 rounded">
+                            <p class="text-sm">• Real-time cap table</p>
+                            <p class="text-sm">• Dilution tracking</p>
+                            <p class="text-sm">• Visual ownership charts</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Exit Scenarios</h2>
+                        <p class="text-gray-600">Model different exit valuations</p>
+                        <div class="mt-4 p-4 bg-gray-50 rounded">
+                            <p class="text-sm">• $10M to $1B+ scenarios</p>
+                            <p class="text-sm">• Founder payout calculations</p>
+                            <p class="text-sm">• Scenario comparison</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-yellow-800 mb-2">Demo Version</h3>
+                    <p class="text-yellow-700">
+                        This is a static demo. The full interactive application is built with Rust + Leptos 
+                        and provides real-time equity modeling capabilities.
+                    </p>
+                    <p class="text-sm text-yellow-600 mt-2">
+                        To run the full version, we need to resolve the Rust build toolchain issues on Windows.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

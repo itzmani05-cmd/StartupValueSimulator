@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Equity Scenario Builder - Interactive Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-3xl font-bold text-gray-900">
+                                🚀 Startup Equity Scenario Builder
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        Model ownership changes across funding rounds
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-blue-800 mb-2">
+                        Welcome to the Equity Scenario Builder
+                    </h2>
+                    <p class="text-blue-700">
+                        This is a fully interactive demo! Model how funding rounds, ESOP allocations, and equity splits affect founder ownership 
+                        and eventual payouts. Test different scenarios to understand dilution impact.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Company Setup -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Setup & Inputs -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Founder Setup -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Founder Setup</h2>
+                        
+                        <!-- Add New Founder -->
+                        <div class="mb-6">
+                            <div class="flex space-x-2">
+                                <input type="text" id="newFounderName" placeholder="Founder Name" 
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button onclick="addFounder()" 
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Add Founder
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Founders List -->
+                        <div id="foundersList" class="space-y-4">
+                            <!-- Founders will be added here dynamically -->
+                        </div>
+
+                        <!-- Total Ownership Warning -->
+                        <div id="ownershipWarning" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg hidden">
+                            <div class="text-yellow-800 text-sm">
+                                ⚠️ Total founder ownership: <span id="totalOwnership">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Funding Round -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Funding Round</h2>
+                        
+                        <!-- Round Details -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Round Name</label>
+                                <input type="text" id="roundName" value="Seed Round" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Investment Amount (USD)</label>
+                                <input type="number" id="investmentAmount" value="1000000" step="100000" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pre-Money Valuation (USD)</label>
+                                <input type="number" id="preMoneyValuation" value="5000000" step="100000" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ESOP Allocation (%)</label>
+                                <input type="number" id="esopAllocation" value="10" step="0.1" min="0" max="100" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- Round Summary -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <h3 class="font-medium text-blue-800 mb-2">Round Summary</h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-blue-600">Post-Money Valuation:</span>
+                                    <span class="ml-2 font-medium" id="postMoneyValuation">$6.0M</span>
+                                </div>
+                                <div>
+                                    <span class="text-blue-600">Equity Percentage:</span>
+                                    <span class="ml-2 font-medium" id="equityPercentage">16.7%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Round Button -->
+                        <button onclick="addFundingRound()" 
+                                class="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                            Add Funding Round
+                        </button>
+
+                        <!-- Existing Rounds -->
+                        <div id="existingRounds" class="mt-6 hidden">
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Existing Rounds</h3>
+                            <div id="roundsList" class="space-y-2">
+                                <!-- Rounds will be added here dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Results & Visualizations -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Cap Table -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Cap Table</h2>
+                        
+                        <!-- Company Summary -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-blue-600 font-medium">Total Shares:</span>
+                                    <span class="ml-2 text-lg font-bold">10,000,000</span>
+                                </div>
+                                <div>
+                                    <span class="text-blue-600 font-medium">Current Value:</span>
+                                    <span class="ml-2 text-lg font-bold" id="currentCompanyValue">$0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cap Table -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stakeholder</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ownership</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shares</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value at $10M</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="capTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Cap table will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Ownership Chart -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">Ownership Distribution</h3>
+                            <canvas id="ownershipChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Exit Scenarios -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Exit Scenarios</h2>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="exitScenarios">
+                            <!-- Exit scenarios will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-12 text-center text-gray-500 text-sm">
+                <p>
+                    This tool helps model equity scenarios but should not be considered as financial or legal advice. 
+                    Consult with qualified professionals for actual equity planning.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global state
+        let company = {
+            name: "My Startup",
+            totalShares: 10000000,
+            founders: [
+                { name: "Founder 1", initialOwnership: 50, currentOwnership: 50, shares: 5000000 },
+                { name: "Founder 2", initialOwnership: 50, currentOwnership: 50, shares: 5000000 }
+            ],
+            fundingRounds: [],
+            esopPool: { totalAllocation: 0, allocated: 0, reserved: 0 },
+            currentValuation: 0
+        };
+
+        let ownershipChart = null;
+
+        // Initialize the application
+        function init() {
+            updateFoundersList();
+            updateCapTable();
+            updateExitScenarios();
+            updateRoundSummary();
+            createOwnershipChart();
+        }
+
+        // Add a new founder
+        function addFounder() {
+            const nameInput = document.getElementById('newFounderName');
+            const name = nameInput.value.trim();
+            
+            if (name) {
+                company.founders.push({
+                    name: name,
+                    initialOwnership: 0,
+                    currentOwnership: 0,
+                    shares: 0
+                });
+                
+                nameInput.value = '';
+                updateFoundersList();
+                updateCapTable();
+                updateExitScenarios();
+            }
+        }
+
+        // Remove a founder
+        function removeFounder(index) {
+            company.founders.splice(index, 1);
+            updateFoundersList();
+            updateCapTable();
+            updateExitScenarios();
+        }
+
+        // Update founder ownership
+        function updateFounderOwnership(index, ownership) {
+            company.founders[index].initialOwnership = parseFloat(ownership);
+            company.founders[index].currentOwnership = parseFloat(ownership);
+            company.founders[index].shares = Math.round(company.totalShares * parseFloat(ownership) / 100);
+            
+            updateFoundersList();
+            updateCapTable();
+            updateExitScenarios();
+            updateOwnershipChart();
+        }
+
+        // Update founders list display
+        function updateFoundersList() {
+            const container = document.getElementById('foundersList');
+            const warning = document.getElementById('ownershipWarning');
+            const totalOwnershipSpan = document.getElementById('totalOwnership');
+            
+            let html = '';
+            let totalOwnership = 0;
+            
+            company.founders.forEach((founder, index) => {
+                totalOwnership += founder.initialOwnership;
+                html += `
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <input type="text" value="${founder.name}" 
+                                   onchange="company.founders[${index}].name = this.value; updateCapTable(); updateExitScenarios();"
+                                   class="text-lg font-medium bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2">
+                            <button onclick="removeFounder(${index})" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Initial Ownership</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="number" step="0.1" min="0" max="100" value="${founder.initialOwnership}"
+                                           onchange="updateFounderOwnership(${index}, this.value)"
+                                           class="w-20 px-2 py-1 border border-gray-300 rounded text-sm">
+                                    <span class="text-sm text-gray-500">%</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Ownership</label>
+                                <div class="text-lg font-semibold text-blue-600">${founder.currentOwnership.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 text-sm text-gray-600">
+                            Shares: ${founder.shares.toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            totalOwnershipSpan.textContent = totalOwnership.toFixed(1) + '%';
+            
+            if (Math.abs(totalOwnership - 100) > 0.1) {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+        }
+
+        // Add funding round
+        function addFundingRound() {
+            const round = {
+                name: document.getElementById('roundName').value,
+                amount: parseFloat(document.getElementById('investmentAmount').value),
+                valuation: parseFloat(document.getElementById('preMoneyValuation').value),
+                esopAllocation: parseFloat(document.getElementById('esopAllocation').value)
+            };
+            
+            company.fundingRounds.push(round);
+            
+            // Update company state
+            company.currentValuation = round.valuation + round.amount;
+            
+            // Update ESOP pool
+            company.esopPool.totalAllocation += round.esopAllocation;
+            
+            // Update founder ownership (simplified dilution calculation)
+            const equitySold = (round.amount / company.currentValuation) * 100;
+            const dilutionFactor = (100 - equitySold - round.esopAllocation) / 100;
+            
+            company.founders.forEach(founder => {
+                founder.currentOwnership *= dilutionFactor;
+                founder.shares = Math.round(company.totalShares * founder.currentOwnership / 100);
+            });
+            
+            updateCapTable();
+            updateExitScenarios();
+            updateOwnershipChart();
+            updateExistingRounds();
+        }
+
+        // Update existing rounds display
+        function updateExistingRounds() {
+            const container = document.getElementById('existingRounds');
+            const roundsList = document.getElementById('roundsList');
+            
+            if (company.fundingRounds.length > 0) {
+                container.classList.remove('hidden');
+                
+                let html = '';
+                company.fundingRounds.forEach(round => {
+                    html += `
+                        <div class="bg-gray-50 px-3 py-2 rounded text-sm">
+                            <span class="font-medium">${round.name}</span>
+                            <span class="text-gray-600 ml-2">
+                                - $${(round.amount / 1000000).toFixed(1)}M at 
+                                $${(round.valuation / 1000000).toFixed(1)}M valuation
+                            </span>
+                        </div>
+                    `;
+                });
+                
+                roundsList.innerHTML = html;
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Update round summary
+        function updateRoundSummary() {
+            const investmentAmount = parseFloat(document.getElementById('investmentAmount').value);
+            const preMoneyValuation = parseFloat(document.getElementById('preMoneyValuation').value);
+            const postMoneyValuation = investmentAmount + preMoneyValuation;
+            const equityPercentage = (investmentAmount / postMoneyValuation) * 100;
+            
+            document.getElementById('postMoneyValuation').textContent = `$${(postMoneyValuation / 1000000).toFixed(1)}M`;
+            document.getElementById('equityPercentage').textContent = `${equityPercentage.toFixed(1)}%`;
+        }
+
+        // Update cap table
+        function updateCapTable() {
+            const tbody = document.getElementById('capTableBody');
+            const currentValue = document.getElementById('currentCompanyValue');
+            
+            let html = '';
+            
+            // Add founders
+            company.founders.forEach(founder => {
+                const valueAt10M = (founder.currentOwnership / 100) * 10000000;
+                html += `
+                    <tr class="bg-blue-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="text-sm font-medium text-gray-900">${founder.name}</div>
+                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Founder</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-medium">${founder.currentOwnership.toFixed(1)}%</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${founder.shares.toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">$${(valueAt10M / 1000000).toFixed(1)}M</div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Add ESOP pool if exists
+            if (company.esopPool.totalAllocation > 0) {
+                const esopShares = Math.round(company.totalShares * company.esopPool.totalAllocation / 100);
+                const valueAt10M = (company.esopPool.totalAllocation / 100) * 10000000;
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">ESOP Pool</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-medium">${company.esopPool.totalAllocation.toFixed(1)}%</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${esopShares.toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">$${(valueAt10M / 1000000).toFixed(1)}M</div>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Add investors from funding rounds
+            company.fundingRounds.forEach(round => {
+                const equitySold = (round.amount / (round.valuation + round.amount)) * 100;
+                const investorShares = Math.round(company.totalShares * equitySold / 100);
+                const valueAt10M = (equitySold / 100) * 10000000;
+                
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${round.name} Investors</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-medium">${equitySold.toFixed(1)}%</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${investorShares.toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">$${(valueAt10M / 1000000).toFixed(1)}M</div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            
+            // Update current company value
+            if (company.currentValuation > 0) {
+                currentValue.textContent = `$${(company.currentValuation / 1000000).toFixed(1)}M`;
+            }
+        }
+
+        // Update exit scenarios
+        function updateExitScenarios() {
+            const container = document.getElementById('exitScenarios');
+            const exitValuations = [10, 25, 50, 100, 250, 500, 1000]; // in millions
+            
+            let html = '';
+            
+            exitValuations.forEach(valuation => {
+                const valuationInDollars = valuation * 1000000;
+                let totalFounderValue = 0;
+                let founderPayouts = '';
+                
+                company.founders.forEach(founder => {
+                    const payout = (founder.currentOwnership / 100) * valuationInDollars;
+                    const dilution = founder.initialOwnership - founder.currentOwnership;
+                    totalFounderValue += payout;
+                    
+                    founderPayouts += `
+                        <div class="bg-white rounded p-3 border">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-800">${founder.name}</span>
+                                <span class="text-sm text-gray-500">${founder.currentOwnership.toFixed(1)}%</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                    <span class="text-gray-600">Payout:</span>
+                                    <span class="ml-2 font-semibold text-green-600">$${(payout / 1000000).toFixed(1)}M</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">Dilution:</span>
+                                    <span class="ml-2 font-semibold ${dilution > 10 ? 'text-red-600' : dilution > 5 ? 'text-orange-600' : 'text-green-600'}">
+                                        ${dilution > 0 ? `-${dilution.toFixed(1)}%` : 'None'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">$${valuation}M Exit</h3>
+                            <span class="text-sm text-gray-500">Acquisition</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="text-2xl font-bold text-blue-600">$${valuation}M</div>
+                            <div class="text-sm text-gray-600">Exit Valuation</div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <h4 class="font-medium text-gray-700">Founder Payouts</h4>
+                            ${founderPayouts}
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-t border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-gray-700">Total Founder Value:</span>
+                                <span class="text-lg font-bold text-green-600">$${(totalFounderValue / 1000000).toFixed(1)}M</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Create ownership chart
+        function createOwnershipChart() {
+            const ctx = document.getElementById('ownershipChart').getContext('2d');
+            
+            ownershipChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#3B82F6', // Blue for founders
+                            '#10B981', // Green for ESOP
+                            '#6B7280', // Gray for investors
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            updateOwnershipChart();
+        }
+
+        // Update ownership chart
+        function updateOwnershipChart() {
+            if (!ownershipChart) return;
+            
+            const labels = [];
+            const data = [];
+            
+            // Add founders
+            company.founders.forEach(founder => {
+                if (founder.currentOwnership > 0) {
+                    labels.push(founder.name);
+                    data.push(founder.currentOwnership);
+                }
+            });
+            
+            // Add ESOP pool
+            if (company.esopPool.totalAllocation > 0) {
+                labels.push('ESOP Pool');
+                data.push(company.esopPool.totalAllocation);
+            }
+            
+            // Add investors
+            company.fundingRounds.forEach(round => {
+                const equitySold = (round.amount / (round.valuation + round.amount)) * 100;
+                if (equitySold > 0) {
+                    labels.push(`${round.name} Investors`);
+                    data.push(equitySold);
+                }
+            });
+            
+            ownershipChart.data.labels = labels;
+            ownershipChart.data.datasets[0].data = data;
+            ownershipChart.update();
+        }
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update round summary when inputs change
+            document.getElementById('investmentAmount').addEventListener('input', updateRoundSummary);
+            document.getElementById('preMoneyValuation').addEventListener('input', updateRoundSummary);
+            
+            init();
+        });
+    </script>
+</body>
+</html>
